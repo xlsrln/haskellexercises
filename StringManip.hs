@@ -6,8 +6,8 @@ uppercase, lowercase :: String -> String
 uppercase = map toUpper
 lowercase = map toLower
 
-capitalize :: String -> String
-capitalize x =
+capitalise :: String -> String
+capitalis x =
   let capWord []     = []
       capWord (x:xs) = toUpper x : xs
   in unwords (map capWord (words x))

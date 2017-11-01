@@ -29,10 +29,20 @@ fstPlusSnd :: (Num a) => (a, a) -> a
 fstPlusSnd (x, y) = x + y
 
 
-scanrr :: (a -> b -> b) -> b -> [a] -> [b]
-scanrr f c [] = [c]
-scanrr f d list@(x:xs) =  f x (head (scanrr f d xs)):(scanrr f d xs)
+scanr' :: (a -> b -> b) -> b -> [a] -> [b]
+scanr' f c [] = [c]
+scanr' f d list@(x:xs) =  f x (head (scanr' f d xs)):(scanr' f d xs)
 
---scanR :: (a -> b -> b) -> b -> [a] -> [b]
---scanR f c x = foldr g [c] x where
---    g x y = (f x (head y)):y
+scanR :: (a -> b -> b) -> b -> [a] -> [b]
+scanR f c [] = [c]
+scanR f c xxs@(x:xs) = (foldr f c xxs):(scanR f c xs)
+
+scanR' :: (a -> b -> b) -> b -> [a] -> [b]
+scanR' f c x = foldr g [c] x where
+    g x y = (f x (head y)):y
+    
+data Foo = Bar | Baz Int
+
+g :: Foo -> Bool
+g Bar {} = True
+g Baz {} = False

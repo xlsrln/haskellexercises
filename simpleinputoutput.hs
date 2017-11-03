@@ -18,7 +18,6 @@ trianglearea2 = do
     height <- getLine
     putStrLn $ "Area: " ++ show ((read base)*(read height)/2)
 
-
 greet = do
     putStrLn "Your name"
     name <- getLine

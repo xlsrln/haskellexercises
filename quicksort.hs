@@ -28,11 +28,30 @@ quickSort :: (Ord a) => [a] -> [a]
 quickSort x = (quickSort' usual x)
 
 
--- for :: a -> (a -> Bool) -> (a -> a) -> (a -> IO ()) -> IO ()
--- for ::  -> (a -> Bool) -> (a -> a) -> (a -> IO ()) -> IO ()
+for :: a -> (a -> Bool) -> (a -> a) -> (a -> IO ()) -> IO ()
+
+-- wrong: should not do the first job if the condition is not satisfied
 for i p f job = do
-                 let x = map f [i | i<-[1..100], p i]
-                 print $ head x
-                 for (i+1) p f job
+                 job i
+                 if not (p i) then return () 
+                              else for (f i) p f job
+-- right
+for' i p f job = do
+                 if (p i) 
+                 then do job i
+                         for' (f i) p f job
+                 else return ()
                  
--- for 1 (<10) (+1) print
+                 
+                 
+sequenceIO :: [IO a] -> IO [a]
+sequenceIO [] = do return []
+sequenceIO (x:xs) = do
+                result <- x
+                rest <- sequenceIO xs
+                return (result:rest)
+
+mapIO :: (a -> IO b) -> [a] -> IO [b]
+mapIO f [] = return []
+mapIO f (x:xs) = do f x 
+                    mapIO f xs

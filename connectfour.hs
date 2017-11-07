@@ -1,12 +1,5 @@
 import Data.List
 
--- data Player p = Player1 | Player2
-
--- nextPlayer Player1 = Player2
--- nextPlayer Player2 = Player1
-
--- x = Player1
--- o = Player2
 nxt "x" = "o"
 nxt "o" = "x"
 

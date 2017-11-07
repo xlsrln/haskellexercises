@@ -1,6 +1,5 @@
 import Text.Read
 import Control.Monad
-import Control.Monad.Trans.Maybe 
 
 main = do 
     putStrLn "enter number: "
@@ -48,6 +47,9 @@ adding6 = do
         Just d -> putStrLn $ "the sum is " ++ show d
         Nothing -> do putStrLn "not good"
                       adding6
+            
+
+
                 
 adding3 :: IO ()        
 adding3 = do 

@@ -1,3 +1,4 @@
+import Data.List
 
 -- data Player p = Player1 | Player2
 
@@ -20,7 +21,7 @@ main = do turn "x" initialboard
 --main action, asks for input and does the stuff
 turn s board = do 
         putStrLn " "
-        putStrLn $ "player " ++ s ++ " turn, enter column: "
+        putStr $ "player " ++ s ++ " turn, enter column: "
         
         column <- read <$> getLine :: IO Int
         let newboard = putCoin s column board
@@ -29,14 +30,14 @@ turn s board = do
         printBoard $ map reverse newboard
         case status newboard of
             "-" -> turn (nxt s) newboard
-            c -> putStrLn $ "player " ++ c ++ " won"
-
+            c -> do putStrLn $ "player " ++ c ++ " won"
+                    putStrLn " "
 
 --main printing function, prints the current board as rows of strings
 printBoard :: [[String]] -> IO ()
 printBoard board = do
                     let rest = removeRow board
-                    print $ printRow board
+                    putStrLn $ printRow board
                     if rest == emptyrow then return ()
                         else printBoard rest
 
@@ -55,7 +56,7 @@ contains xs [] = False
 contains (x:xs) (y:ys) = (x == y) && contains xs ys || contains (x:xs) ys
 
 --and the following functions
-checklist board = concat [rows board, columns board]
+checklist board = concat [rows board, columns board, diagonals board]
 
 --extract all columns to strings
 columns :: [[String]] -> [String]
@@ -67,8 +68,21 @@ rows [] = []
 rows board = row board : rows (removeRow board) where
     row board = concat [x | (x:xs) <- board ]
 
---extract all diagonals to strings
--- aah
+--extract all diagonals to strings -- warning for messy code
+diagonal n (x:rest) = if n<(length x) then (x !! n) : diagonal (n+1) rest else []
+diagonal _ [] = []
+
+--finds middle diagonal and all upper triangular ones
+diagonals1 :: [[String]] -> [String]
+diagonals1 [] = []
+diagonals1 board = (concat $ diagonal 0 board) : diagonals1 (removeRow board)
+
+-- concats diagonals1 with diagonals1 of the transposed board
+diagonals2 :: [[String]] -> [String]
+diagonals2 board = concat $ (diagonals1 board):[diagonals1 (transpose board)]
+
+-- a total of four calls to diagonals1 is concatenated, this time with/without reverse
+diagonals board = concat $ diagonals2 board : [diagonals2 (reverse board)]
 
 --other functions
 printRow :: [[String]] -> String
@@ -77,10 +91,10 @@ printRow board = concat [x | (x:xs) <- board]
 removeRow :: [[String]] -> [[String]]
 removeRow board = [xs | (x:xs) <- board]
 
--- putCoin :: Int -> [[String]] -> [[String]]
+putCoin :: (Eq t, Num t) => [Char] -> t -> [[[Char]]] -> [[[Char]]]
 putCoin s 1 (col:cols) = putCoinCol s col : cols
 putCoin s n (col:cols) = col : putCoin s (n-1) cols
 
--- putCoinCol :: [String] -> [String]
+putCoinCol :: [Char] -> [[Char]] -> [[Char]]
 putCoinCol s ("-":rs) = (s:rs)
 putCoinCol s (r:rs) = r : putCoinCol s rs

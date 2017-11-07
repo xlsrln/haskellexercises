@@ -4,20 +4,30 @@ nxt "x" = "o"
 nxt "o" = "x"
 
 --board stuff
-vsize = 5
-hsize = 6
+vsize = 6
+hsize = 7
 emptyrow = replicate hsize []
 initialboard = map (replicate vsize) $ replicate hsize "-"
 
 main = do turn "x" initialboard     
         
 --main action, asks for input and does the stuff
+
+
+doStuff s board = do
+        column <- read <$> getLine :: IO Int
+        let newboard = putCoin s column board
+        if newboard == board 
+                then do putStr "wrong input try again: "
+                        doStuff s board
+                else return newboard
+
 turn s board = do 
         putStrLn " "
         putStr $ "player " ++ s ++ " turn, enter column: "
         
-        column <- read <$> getLine :: IO Int
-        let newboard = putCoin s column board
+        let new = doStuff s board
+        newboard <- new
         
         putStrLn " "
         printBoard $ map reverse newboard
@@ -84,10 +94,11 @@ printRow board = concat [x | (x:xs) <- board]
 removeRow :: [[String]] -> [[String]]
 removeRow board = [xs | (x:xs) <- board]
 
-putCoin :: (Eq t, Num t) => [Char] -> t -> [[[Char]]] -> [[[Char]]]
+putCoin :: String -> Int -> [[[Char]]] -> [[[Char]]]
 putCoin s 1 (col:cols) = putCoinCol s col : cols
-putCoin s n (col:cols) = col : putCoin s (n-1) cols
+putCoin s n b@(col:cols) = if n > hsize then b else col : putCoin s (n-1) cols
 
 putCoinCol :: [Char] -> [[Char]] -> [[Char]]
 putCoinCol s ("-":rs) = (s:rs)
 putCoinCol s (r:rs) = r : putCoinCol s rs
+putCoinCol s [] = []
